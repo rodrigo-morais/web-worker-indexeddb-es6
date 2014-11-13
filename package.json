@@ -1,0 +1,22 @@
+{
+  "name": "web-worker-indexeddb-es6",
+  "version": "0.0.1",
+  "description": "Use Web Worker to access the server and save data in IndexedDB to use offline. After save data in IndexedDB the app will access data offline always and will refresh data by Web Worker.",
+  "main": "index.html",
+  "dependencies": {
+    "grunt": "^0.4.5"
+  },
+  "devDependencies": {
+    "grunt-6to5": "^1.0.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rodrigo-morais/web-worker-indexeddb-es6.git"
+  },
+  "author": "Rodrigo Morais",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rodrigo-morais/web-worker-indexeddb-es6/issues"
+  },
+  "homepage": "https://github.com/rodrigo-morais/web-worker-indexeddb-es6"
+}
