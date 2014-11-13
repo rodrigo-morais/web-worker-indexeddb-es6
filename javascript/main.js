@@ -1,4 +1,6 @@
-﻿var main = (function () {
+﻿import localDB from 'javascript/indexedDB';
+
+var main = (function () {
     'use strict';
 
     var _showData = function () {

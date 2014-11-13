@@ -1,110 +1,115 @@
-"use strict";
-
-var main = (function () {
+define(["exports", "javascript/indexedDB"], function (exports, _javascriptIndexedDB) {
   "use strict";
 
-  var _showData = function () {
-    localDB.init().then(function () {
-      if (localDB.hasData()) {
-        _findByLocal();
-        _updateLocalData();
-      } else {
-        _findByServer();
-      }
-    }, function (error) {
-      _findByServer();
-    });
-  };
+  var localDB = _javascriptIndexedDB.default;
 
-  var _showRepos = function (repos) {
-    var repoList = document.querySelector(".repos");
 
-    repos.forEach(function (repo) {
-      var repoElement = document.createElement("li"), linkRepo = document.createElement("a");
+  var main = (function () {
+    "use strict";
 
-      linkRepo.appendChild(document.createTextNode(repo.name));
-      linkRepo.href = repo.url;
-      linkRepo.target = "_blank";
-
-      repoElement.appendChild(linkRepo);
-      repoElement.appendChild(document.createTextNode(" - " + repo.description));
-
-      repoList.appendChild(repoElement);
-    });
-  };
-
-  var _clearResposList = function () {
-    var repoList = document.querySelector(".repos");
-
-    repoList.innerHTML = "";
-  };
-
-  var _saveLocal = function (repos) {
-    repos.forEach(function (repo) {
-      localDB.insert(repo);
-    });
-  };
-
-  var _findByServer = function () {
-    if (window.Worker) {
-      var worker = new Worker("javascript/worker/worker.js");
-
-      worker.addEventListener("message", function (e) {
-        var repos = e.data;
-
-        if (e.data.length > 0) {
-          _showRepos(repos);
-          _saveLocal(repos);
-          worker.postMessage({ cmd: "load" });
+    var _showData = function () {
+      localDB.init().then(function () {
+        if (localDB.hasData()) {
+          _findByLocal();
+          _updateLocalData();
+        } else {
+          _findByServer();
         }
-      }, false);
+      }, function (error) {
+        _findByServer();
+      });
+    };
 
-      worker.postMessage({ cmd: "load" });
-    }
-  };
+    var _showRepos = function (repos) {
+      var repoList = document.querySelector(".repos");
 
-  var _findByLocal = function () {
-    _showRepos(localDB.getItems());
-  };
+      repos.forEach(function (repo) {
+        var repoElement = document.createElement("li"), linkRepo = document.createElement("a");
 
-  var _insertRepoLocal = function (repo) {
-    localDB.insert(repo);
-  };
+        linkRepo.appendChild(document.createTextNode(repo.name));
+        linkRepo.href = repo.url;
+        linkRepo.target = "_blank";
 
-  var _removetRepoLocal = function (repo) {
-    localDB.remove(repo);
-  };
+        repoElement.appendChild(linkRepo);
+        repoElement.appendChild(document.createTextNode(" - " + repo.description));
 
-  var _updateLocalData = function () {
-    if (window.Worker) {
-      var worker = new Worker("javascript/worker/worker.js");
+        repoList.appendChild(repoElement);
+      });
+    };
 
-      worker.addEventListener("message", function (e) {
-        var repos = e.data;
+    var _clearResposList = function () {
+      var repoList = document.querySelector(".repos");
 
-        repos.forEach(function (repo) {
-          if (repo.action === "insert") {
-            _insertRepoLocal(repo.repo);
-          } else {
-            _removetRepoLocal(repo.repo);
+      repoList.innerHTML = "";
+    };
+
+    var _saveLocal = function (repos) {
+      repos.forEach(function (repo) {
+        localDB.insert(repo);
+      });
+    };
+
+    var _findByServer = function () {
+      if (window.Worker) {
+        var worker = new Worker("javascript/worker/worker.js");
+
+        worker.addEventListener("message", function (e) {
+          var repos = e.data;
+
+          if (e.data.length > 0) {
+            _showRepos(repos);
+            _saveLocal(repos);
+            worker.postMessage({ cmd: "load" });
           }
-        });
+        }, false);
 
-        _clearResposList();
-        _findByLocal();
-      }, false);
+        worker.postMessage({ cmd: "load" });
+      }
+    };
 
-      worker.postMessage({ cmd: "update", repos: localDB.getItems() });
-    }
-  };
+    var _findByLocal = function () {
+      _showRepos(localDB.getItems());
+    };
 
-  var _load = function () {
-    _showData();
-  };
+    var _insertRepoLocal = function (repo) {
+      localDB.insert(repo);
+    };
 
-  return {
-    load: _load
-  };
-})();
+    var _removetRepoLocal = function (repo) {
+      localDB.remove(repo);
+    };
 
-main.load();
+    var _updateLocalData = function () {
+      if (window.Worker) {
+        var worker = new Worker("javascript/worker/worker.js");
+
+        worker.addEventListener("message", function (e) {
+          var repos = e.data;
+
+          repos.forEach(function (repo) {
+            if (repo.action === "insert") {
+              _insertRepoLocal(repo.repo);
+            } else {
+              _removetRepoLocal(repo.repo);
+            }
+          });
+
+          _clearResposList();
+          _findByLocal();
+        }, false);
+
+        worker.postMessage({ cmd: "update", repos: localDB.getItems() });
+      }
+    };
+
+    var _load = function () {
+      _showData();
+    };
+
+    return {
+      load: _load
+    };
+  })();
+
+  main.load();
+});
