@@ -16,43 +16,45 @@ define(["exports"], function (exports) {
       var deferred = Q.defer();
 
       if (window.indexedDB) {
-        var request = window.indexedDB.open("github", 3);
+        (function () {
+          var request = window.indexedDB.open("github", 3);
 
-        request.onerror = function (event) {
-          console.log("Error when open IndexedDB.");
-          state = "close";
+          request.onerror = function (event) {
+            console.log("Error when open IndexedDB.");
+            state = "close";
 
-          deferred.resolve();
-        };
+            deferred.resolve();
+          };
 
-        request.onsuccess = function (event) {
-          db = event.target.result;
-          state = "open";
+          request.onsuccess = function (event) {
+            db = event.target.result;
+            state = "open";
 
-          _count().then(function (count) {
-            if (count === 0) {
-              containsData = false;
-              deferred.resolve();
-            } else {
-              containsData = true;
-              _getAll().then(function (_items) {
-                items = _items;
+            _count().then(function (count) {
+              if (count === 0) {
+                containsData = false;
                 deferred.resolve();
-              });
+              } else {
+                containsData = true;
+                _getAll().then(function (_items) {
+                  items = _items;
+                  deferred.resolve();
+                });
+              }
+            });
+          };
+
+          request.onupgradeneeded = function (event) {
+            var newVersion = event.target.result;
+
+            if (!newVersion.objectStoreNames.contains("repositories")) {
+              newVersion.createObjectStore("repositories", { keyPath: "id" });
             }
-          });
-        };
-
-        request.onupgradeneeded = function (event) {
-          var newVersion = event.target.result;
-
-          if (!newVersion.objectStoreNames.contains("repositories")) {
-            newVersion.createObjectStore("repositories", { keyPath: "id" });
-          }
-        };
-
-        return deferred.promise;
+          };
+        })();
       }
+
+      return deferred.promise;
     };
 
     var _insert = function (repository) {

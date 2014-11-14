@@ -51,19 +51,21 @@ define(["exports", "javascript/indexedDB"], function (exports, _javascriptIndexe
 
     var _findByServer = function () {
       if (window.Worker) {
-        var worker = new Worker("javascript/worker/worker.js");
+        (function () {
+          var worker = new Worker("javascript/worker/worker.js");
 
-        worker.addEventListener("message", function (e) {
-          var repos = e.data;
+          worker.addEventListener("message", function (e) {
+            var repos = e.data;
 
-          if (e.data.length > 0) {
-            _showRepos(repos);
-            _saveLocal(repos);
-            worker.postMessage({ cmd: "load" });
-          }
-        }, false);
+            if (e.data.length > 0) {
+              _showRepos(repos);
+              _saveLocal(repos);
+              worker.postMessage({ cmd: "load" });
+            }
+          }, false);
 
-        worker.postMessage({ cmd: "load" });
+          worker.postMessage({ cmd: "load" });
+        })();
       }
     };
 
@@ -81,24 +83,26 @@ define(["exports", "javascript/indexedDB"], function (exports, _javascriptIndexe
 
     var _updateLocalData = function () {
       if (window.Worker) {
-        var worker = new Worker("javascript/worker/worker.js");
+        (function () {
+          var worker = new Worker("javascript/worker/worker.js");
 
-        worker.addEventListener("message", function (e) {
-          var repos = e.data;
+          worker.addEventListener("message", function (e) {
+            var repos = e.data;
 
-          repos.forEach(function (repo) {
-            if (repo.action === "insert") {
-              _insertRepoLocal(repo.repo);
-            } else {
-              _removetRepoLocal(repo.repo);
-            }
-          });
+            repos.forEach(function (repo) {
+              if (repo.action === "insert") {
+                _insertRepoLocal(repo.repo);
+              } else {
+                _removetRepoLocal(repo.repo);
+              }
+            });
 
-          _clearResposList();
-          _findByLocal();
-        }, false);
+            _clearResposList();
+            _findByLocal();
+          }, false);
 
-        worker.postMessage({ cmd: "update", repos: localDB.getItems() });
+          worker.postMessage({ cmd: "update", repos: localDB.getItems() });
+        })();
       }
     };
 

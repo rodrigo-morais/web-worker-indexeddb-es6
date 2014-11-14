@@ -1,10 +1,10 @@
 ﻿import localDB from 'javascript/indexedDB';
 
-var main = (function () {
+let main = (function () {
     'use strict';
 
-    var _showData = function () {
-        localDB.init().then(function () {
+    let _showData = () => {
+        localDB.init().then(() => {
             if (localDB.hasData()) {
                 _findByLocal();
                 _updateLocalData();
@@ -12,16 +12,16 @@ var main = (function () {
             else {
                 _findByServer();
             }
-        }, function (error) {
+        }, (error) => {
             _findByServer();
         });
     };
 
-    var _showRepos = function (repos) {
-        var repoList = document.querySelector(".repos");
+    let _showRepos = (repos) => {
+        let repoList = document.querySelector(".repos");
 
-        repos.forEach(function (repo) {
-            var repoElement = document.createElement('li'),
+        repos.forEach((repo) => {
+            let repoElement = document.createElement('li'),
                 linkRepo = document.createElement('a');
 
             linkRepo.appendChild(document.createTextNode(repo.name));
@@ -35,24 +35,24 @@ var main = (function () {
         });
     };
 
-    var _clearResposList = function () {
-        var repoList = document.querySelector(".repos");
+    let _clearResposList = () => {
+        let repoList = document.querySelector(".repos");
 
         repoList.innerHTML = "";
     };
 
-    var _saveLocal = function (repos) {
-        repos.forEach(function (repo) {
+    let _saveLocal = (repos) => {
+        repos.forEach((repo) => {
             localDB.insert(repo);
         });
     };
 
-    var _findByServer = function () {
+    let _findByServer = () => {
         if (window.Worker) {
-            var worker = new Worker('javascript/worker/worker.js');
+            let worker = new Worker('javascript/worker/worker.js');
 
-            worker.addEventListener('message', function (e) {
-                var repos = e.data;
+            worker.addEventListener('message', (e) => {
+                let repos = e.data;
 
                 if (e.data.length > 0) {
                     _showRepos(repos);
@@ -66,26 +66,26 @@ var main = (function () {
         }
     };
 
-    var _findByLocal = function () {
+    let _findByLocal = () => {
         _showRepos(localDB.getItems());
     };
 
-    var _insertRepoLocal = function (repo) {
+    let _insertRepoLocal = (repo) => {
         localDB.insert(repo);
     };
 
-    var _removetRepoLocal = function (repo) {
+    let _removetRepoLocal = (repo) => {
         localDB.remove(repo);
     };
 
-    var _updateLocalData = function () {
+    let _updateLocalData = () => {
         if (window.Worker) {
-            var worker = new Worker('javascript/worker/worker.js');
+            let worker = new Worker('javascript/worker/worker.js');
 
-            worker.addEventListener('message', function (e) {
-                var repos = e.data;
+            worker.addEventListener('message', (e) => {
+                let repos = e.data;
                 
-                repos.forEach(function (repo) {
+                repos.forEach((repo) => {
                     if (repo.action === 'insert') {
                         _insertRepoLocal(repo.repo);
                     }
@@ -103,7 +103,7 @@ var main = (function () {
         }
     };
 
-    var _load = function () {
+    let _load = () => {
         _showData();
     };
 
