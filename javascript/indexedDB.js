@@ -1,10 +1,10 @@
-﻿let localDB = (function () {
+﻿let localDB = (() => {
     let db,
         state = 'close',
         containsData = false,
         items;
 
-    let _isOpen = function () {
+    let _isOpen = () => {
         if (state === 'open') {
             return true;
         }
@@ -13,31 +13,31 @@
         }
     }
 
-    let _init = function () {
+    let _init = () => {
         let deferred = Q.defer();
 
         if (window.indexedDB) {
             let request = window.indexedDB.open("github", 3);
 
-            request.onerror = function (event) {
+            request.onerror = (event) => {
                 console.log('Error when open IndexedDB.');
                 state = 'close';
 
                 deferred.resolve();
             };
 
-            request.onsuccess = function (event) {
+            request.onsuccess = (event) => {
                 db = event.target.result;
                 state = 'open';
 
-                _count().then(function (count) {
+                _count().then((count) => {
                     if (count === 0) {
                         containsData = false;
                         deferred.resolve();
                     }
                     else {
                         containsData = true;
-                        _getAll().then(function (_items) {
+                        _getAll().then((_items) => {
                             items = _items;
                             deferred.resolve();
                         });
@@ -45,7 +45,7 @@
                 });
             };
 
-            request.onupgradeneeded = function (event) {
+            request.onupgradeneeded = (event) => {
                 let newVersion = event.target.result;
 
                 if (!newVersion.objectStoreNames.contains('repositories')) {
@@ -57,7 +57,7 @@
         return deferred.promise;
     };
 
-    var _insert = function (repository) {
+    var _insert = (repository) => {
         let now = new Date(),
             transaction = db.transaction(['repositories'], 'readwrite'),
             store = transaction.objectStore('repositories'),
@@ -68,16 +68,16 @@
 
         request = store.add(repository);
 
-        request.onsuccess = function (event) {
+        request.onsuccess = (event) => {
             //console.log('Repository "' + repository.name + '" added in local database.');
         };
 
-        request.onerror = function (event) {
+        request.onerror = (event) => {
             //console.log('Error when added repository "' + repository.name + '" in local database.');
         };
     };
 
-    var _remove = function (repository) {
+    let _remove = function (repository) {
         let transaction = db.transaction(['repositories'], 'readwrite'),
             store = transaction.objectStore('repositories'),
             request;
@@ -93,34 +93,34 @@
         };
     };
 
-    let _count = function () {
+    let _count = () => {
         let transaction = db.transaction(['repositories']),
             store = transaction.objectStore('repositories'),
             count = store.count(),
             deferred = Q.defer();
 
-        count.onsuccess = function (event) {
+        count.onsuccess = (event) => {
             deferred.resolve(count.result);
         };
 
-        count.onerror = function (event) {
+        count.onerror = (event) => {
             deferred.resolve(0);
         };
 
         return deferred.promise;
     };
 
-    let _hasData = function () {
+    let _hasData = () => {
         return containsData;
     };
 
-    let _getAll = function (repository) {
+    let _getAll = (repository) => {
         let transaction = db.transaction(['repositories']),
             store = transaction.objectStore('repositories'),
             deferred = Q.defer(),
             _items = [];
 
-        store.openCursor().onsuccess = function (event) {
+        store.openCursor().onsuccess = (event) => {
             let item = event.target.result;
             if (item) {
                 _items.push(item.value);
@@ -135,7 +135,7 @@
 
     };
 
-    let _getItems = function () {
+    let _getItems = () => {
         return items;
     };
 
