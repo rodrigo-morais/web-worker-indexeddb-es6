@@ -1,12 +1,12 @@
 ﻿importScripts('jquery.hive.pollen.js');
 importScripts('../q.js');
 
-var repositories = (function () {
+let repositories = (() => {
 
     'use strict';
 
-    var _find = function (_page, _per_page) {
-        var page = _page,
+    let _find = (_page, _per_page) => {
+        let page = _page,
         per_page = _per_page,
         url = 'https://api.github.com/search/repositories?q=language:javascript&page=' + page + '&per_page=' + per_page,
         deferred = Q.defer();
@@ -14,13 +14,13 @@ var repositories = (function () {
         $.ajax.get({
             url: url,
             dataType: 'json',
-            success: function (repos) {
-                var repositories = [],
+            success: (repos) => {
+                let repositories = [],
                     repository = {},
                     items = repos.items || [];
 
 
-                items.forEach(function (repo) {
+                items.forEach((repo) => {
                     repository = {
                         id: repo.id,
                         name: repo.name,
@@ -41,20 +41,20 @@ var repositories = (function () {
         return deferred.promise;
     };
 
-    var _findAll = function () {
-        var url = 'https://api.github.com/search/repositories?q=language:javascript',
+    let _findAll = () => {
+        let url = 'https://api.github.com/search/repositories?q=language:javascript',
         deferred = Q.defer();
 
         $.ajax.get({
             url: url,
             dataType: 'json',
-            success: function (repos) {
-                var repositories = [],
+            success: (repos) => {
+                let repositories = [],
                     repository = {},
                     items = repos.items || [];
 
 
-                items.forEach(function (repo) {
+                items.forEach((repo) => {
                     repository = {
                         id: repo.id,
                         name: repo.name,
