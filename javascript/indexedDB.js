@@ -1,10 +1,10 @@
-﻿var localDB = (function () {
-    var db,
+﻿let localDB = (function () {
+    let db,
         state = 'close',
         containsData = false,
         items;
 
-    var _isOpen = function () {
+    let _isOpen = function () {
         if (state === 'open') {
             return true;
         }
@@ -13,11 +13,11 @@
         }
     }
 
-    var _init = function () {
-        var deferred = Q.defer();
+    let _init = function () {
+        let deferred = Q.defer();
 
         if (window.indexedDB) {
-            var request = window.indexedDB.open("github", 3);
+            let request = window.indexedDB.open("github", 3);
 
             request.onerror = function (event) {
                 console.log('Error when open IndexedDB.');
@@ -46,19 +46,19 @@
             };
 
             request.onupgradeneeded = function (event) {
-                var newVersion = event.target.result;
+                let newVersion = event.target.result;
 
                 if (!newVersion.objectStoreNames.contains('repositories')) {
                     newVersion.createObjectStore('repositories', { keyPath: 'id' });
                 }
             };
-
-            return deferred.promise;
         }
+
+        return deferred.promise;
     };
 
     var _insert = function (repository) {
-        var now = new Date(),
+        let now = new Date(),
             transaction = db.transaction(['repositories'], 'readwrite'),
             store = transaction.objectStore('repositories'),
             request;
@@ -78,7 +78,7 @@
     };
 
     var _remove = function (repository) {
-        var transaction = db.transaction(['repositories'], 'readwrite'),
+        let transaction = db.transaction(['repositories'], 'readwrite'),
             store = transaction.objectStore('repositories'),
             request;
 
@@ -93,8 +93,8 @@
         };
     };
 
-    var _count = function () {
-        var transaction = db.transaction(['repositories']),
+    let _count = function () {
+        let transaction = db.transaction(['repositories']),
             store = transaction.objectStore('repositories'),
             count = store.count(),
             deferred = Q.defer();
@@ -110,18 +110,18 @@
         return deferred.promise;
     };
 
-    var _hasData = function () {
+    let _hasData = function () {
         return containsData;
     };
 
-    var _getAll = function (repository) {
-        var transaction = db.transaction(['repositories']),
+    let _getAll = function (repository) {
+        let transaction = db.transaction(['repositories']),
             store = transaction.objectStore('repositories'),
             deferred = Q.defer(),
             _items = [];
 
         store.openCursor().onsuccess = function (event) {
-            var item = event.target.result;
+            let item = event.target.result;
             if (item) {
                 _items.push(item.value);
                 item.continue();
@@ -135,7 +135,7 @@
 
     };
 
-    var _getItems = function () {
+    let _getItems = function () {
         return items;
     };
 

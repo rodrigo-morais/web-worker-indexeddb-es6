@@ -104,6 +104,7 @@ var main = (function () {
     };
 
     var _load = function () {
+        console.log('main');
         _showData();
     };
 
