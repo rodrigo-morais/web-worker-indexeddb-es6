@@ -1,18 +1,18 @@
 ﻿importScripts('repositories.js');
 
-$(function (data) {
+$((data) => {
 
     'use strict';
 
-    var _load = function () {
-        var page = 0,
+    let _load = () => {
+        let page = 0,
         per_page = 100,
         time = 2000;
 
-        setInterval(function () {
+        setInterval(() => {
             page = page + 1;
 
-            repositories.find(page, per_page).then(function (repos) {
+            repositories.find(page, per_page).then((repos) => {
                 if (repos.length === 0 || page >= 7) {
                     self.close();
                 }
@@ -23,9 +23,9 @@ $(function (data) {
         }, time);
     };
 
-    var _insertRepos = function (repos, localRepos, reposChanged) {
-        repos.forEach(function (repo) {
-            var repoReturn = localRepos.filter(function (localRepo) {
+    let _insertRepos = (repos, localRepos, reposChanged) => {
+        repos.forEach((repo) => {
+            let repoReturn = localRepos.filter((localRepo) => {
                 return localRepo.id === repo.id;
             });
 
@@ -38,9 +38,9 @@ $(function (data) {
         });
     };
 
-    var _removeRepos = function (repos, localRepos, reposChanged) {
+    let _removeRepos = (repos, localRepos, reposChanged) => {
         localRepos.forEach(function (localRepo) {
-            var repoReturn = repos.filter(function (repo) {
+            let repoReturn = repos.filter((repo) => {
                 return localRepo.id === repo.id;
             });
 
@@ -53,9 +53,9 @@ $(function (data) {
         });
     };
 
-    var _update = function (localRepos) {
-        repositories.findAll().then(function (repos) {
-            var reposChanged = [];
+    let _update = (localRepos) => {
+        repositories.findAll().then((repos) => {
+            let reposChanged = [];
 
             _insertRepos(repos, localRepos, reposChanged);
 
