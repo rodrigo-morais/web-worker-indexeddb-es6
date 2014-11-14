@@ -1013,7 +1013,7 @@
     Q.spread = spread;
     function spread(value, fulfilled, rejected) {
         return Q(value).spread(fulfilled, rejected);
-    }
+    };
     Promise.prototype.spread = function (fulfilled, rejected) {
         return this.all().then(function (array) {
             return fulfilled.apply(void 0, array);
@@ -1045,8 +1045,8 @@
     * the generator function altogether, and is translated into a
     * rejection for the promise returned by the decorated generator.
     */
-    Q.async = async;
-    function async(makeGenerator) {
+    Q.async = _async;
+    function _async(makeGenerator) {
         return function () {
             // when verb is "send", arg is a value
             // when verb is "throw", arg is an exception

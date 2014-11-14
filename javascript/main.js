@@ -3,8 +3,8 @@
 let main = (function () {
     'use strict';
 
-    let _showData = function () {
-        localDB.init().then(function () {
+    let _showData = () => {
+        localDB.init().then(() => {
             if (localDB.hasData()) {
                 _findByLocal();
                 _updateLocalData();
@@ -12,15 +12,15 @@ let main = (function () {
             else {
                 _findByServer();
             }
-        }, function (error) {
+        }, (error) => {
             _findByServer();
         });
     };
 
-    let _showRepos = function (repos) {
+    let _showRepos = (repos) => {
         let repoList = document.querySelector(".repos");
 
-        repos.forEach(function (repo) {
+        repos.forEach((repo) => {
             let repoElement = document.createElement('li'),
                 linkRepo = document.createElement('a');
 
@@ -35,23 +35,23 @@ let main = (function () {
         });
     };
 
-    let _clearResposList = function () {
+    let _clearResposList = () => {
         let repoList = document.querySelector(".repos");
 
         repoList.innerHTML = "";
     };
 
-    let _saveLocal = function (repos) {
-        repos.forEach(function (repo) {
+    let _saveLocal = (repos) => {
+        repos.forEach((repo) => {
             localDB.insert(repo);
         });
     };
 
-    let _findByServer = function () {
+    let _findByServer = () => {
         if (window.Worker) {
             let worker = new Worker('javascript/worker/worker.js');
 
-            worker.addEventListener('message', function (e) {
+            worker.addEventListener('message', (e) => {
                 let repos = e.data;
 
                 if (e.data.length > 0) {
@@ -66,26 +66,26 @@ let main = (function () {
         }
     };
 
-    let _findByLocal = function () {
+    let _findByLocal = () => {
         _showRepos(localDB.getItems());
     };
 
-    let _insertRepoLocal = function (repo) {
+    let _insertRepoLocal = (repo) => {
         localDB.insert(repo);
     };
 
-    let _removetRepoLocal = function (repo) {
+    let _removetRepoLocal = (repo) => {
         localDB.remove(repo);
     };
 
-    let _updateLocalData = function () {
+    let _updateLocalData = () => {
         if (window.Worker) {
             let worker = new Worker('javascript/worker/worker.js');
 
-            worker.addEventListener('message', function (e) {
+            worker.addEventListener('message', (e) => {
                 let repos = e.data;
                 
-                repos.forEach(function (repo) {
+                repos.forEach((repo) => {
                     if (repo.action === 'insert') {
                         _insertRepoLocal(repo.repo);
                     }
@@ -103,8 +103,7 @@ let main = (function () {
         }
     };
 
-    let _load = function () {
-        console.log('main');
+    let _load = () => {
         _showData();
     };
 

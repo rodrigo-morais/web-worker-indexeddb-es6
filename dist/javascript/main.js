@@ -107,7 +107,6 @@ define(["exports", "javascript/indexedDB"], function (exports, _javascriptIndexe
     };
 
     var _load = function () {
-      console.log("main");
       _showData();
     };
 
