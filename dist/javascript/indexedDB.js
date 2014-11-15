@@ -13,48 +13,48 @@ define(["exports"], function (exports) {
     };
 
     var _init = function () {
-      var deferred = Q.defer();
+      return new Promise(function (resolve, reject) {
+        if (window.indexedDB) {
+          (function () {
+            var request = window.indexedDB.open("github", 3);
 
-      if (window.indexedDB) {
-        (function () {
-          var request = window.indexedDB.open("github", 3);
+            request.onerror = function (event) {
+              console.log("Error when open IndexedDB.");
+              state = "close";
 
-          request.onerror = function (event) {
-            console.log("Error when open IndexedDB.");
-            state = "close";
+              reject("Error when open IndexedDB.");
+            };
 
-            deferred.resolve();
-          };
+            request.onsuccess = function (event) {
+              db = event.target.result;
+              state = "open";
 
-          request.onsuccess = function (event) {
-            db = event.target.result;
-            state = "open";
+              _count().then(function (count) {
+                if (count === 0) {
+                  containsData = false;
+                  resolve();
+                } else {
+                  containsData = true;
+                  _getAll().then(function (_items) {
+                    items = _items;
+                    resolve();
+                  });
+                }
+              });
+            };
 
-            _count().then(function (count) {
-              if (count === 0) {
-                containsData = false;
-                deferred.resolve();
-              } else {
-                containsData = true;
-                _getAll().then(function (_items) {
-                  items = _items;
-                  deferred.resolve();
-                });
+            request.onupgradeneeded = function (event) {
+              var newVersion = event.target.result;
+
+              if (!newVersion.objectStoreNames.contains("repositories")) {
+                newVersion.createObjectStore("repositories", { keyPath: "id" });
               }
-            });
-          };
 
-          request.onupgradeneeded = function (event) {
-            var newVersion = event.target.result;
-
-            if (!newVersion.objectStoreNames.contains("repositories")) {
-              newVersion.createObjectStore("repositories", { keyPath: "id" });
-            }
-          };
-        })();
-      }
-
-      return deferred.promise;
+              resolve();
+            };
+          })();
+        }
+      });
     };
 
     var _insert = function (repository) {
@@ -81,17 +81,17 @@ define(["exports"], function (exports) {
     };
 
     var _count = function () {
-      var transaction = db.transaction(["repositories"]), store = transaction.objectStore("repositories"), count = store.count(), deferred = Q.defer();
+      var transaction = db.transaction(["repositories"]), store = transaction.objectStore("repositories"), count = store.count();
 
-      count.onsuccess = function (event) {
-        deferred.resolve(count.result);
-      };
+      return new Promise(function (resolve, reject) {
+        count.onsuccess = function (event) {
+          resolve(count.result);
+        };
 
-      count.onerror = function (event) {
-        deferred.resolve(0);
-      };
-
-      return deferred.promise;
+        count.onerror = function (event) {
+          resolve(0);
+        };
+      });
     };
 
     var _hasData = function () {
@@ -99,19 +99,19 @@ define(["exports"], function (exports) {
     };
 
     var _getAll = function (repository) {
-      var transaction = db.transaction(["repositories"]), store = transaction.objectStore("repositories"), deferred = Q.defer(), _items = [];
+      var transaction = db.transaction(["repositories"]), store = transaction.objectStore("repositories"), _items = [];
 
-      store.openCursor().onsuccess = function (event) {
-        var item = event.target.result;
-        if (item) {
-          _items.push(item.value);
-          item.continue();
-        } else {
-          deferred.resolve(_items);
-        }
-      };
-
-      return deferred.promise;
+      return new Promise(function (resolve, reject) {
+        store.openCursor().onsuccess = function (event) {
+          var item = event.target.result;
+          if (item) {
+            _items.push(item.value);
+            item.continue();
+          } else {
+            resolve(_items);
+          }
+        };
+      });
     };
 
     var _getItems = function () {
