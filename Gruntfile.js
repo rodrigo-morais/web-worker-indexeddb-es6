@@ -15,6 +15,19 @@
                 }],
             }
         },
+        '6to5': {
+            options: {
+            },
+
+            build: {
+                files: [{
+                    expand: true,
+                    cwd: 'javascript/worker',
+                    src: ['repositories.js', 'worker.js'],
+                    dest: 'dist/javascript/worker',
+                }],
+            }
+        },
         copy: {
             main: {
                 cwd: './',
